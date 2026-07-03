@@ -1,0 +1,45 @@
+{
+  "expo": {
+    "name": "Wayvo",
+    "slug": "wayvo",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "scheme": "wayvo",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0A0A12"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.wayvo.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundColor": "#0A0A12"
+      },
+      "package": "com.wayvo.app"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow Wayvo to access your camera for proof submission."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow Wayvo to access your photos for proof submission."
+        }
+      ],
+      "expo-asset",
+      "@react-native-community/datetimepicker"
+    ]
+  }
+}
