@@ -51,10 +51,11 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     )
 
-    // Get due reminders
+    // Get due reminders (no direct FKs reminders->waver_profiles or
+    // campaigns->brand_profiles, so attach profiles with follow-up queries)
     const { data: reminders, error: reminderError } = await supabase
       .from('reminders')
-      .select('*, waver_profiles!inner(whatsapp_number, users!inner(full_name)), campaigns!inner(title, per_waver_payout, ends_at, brand_profiles!inner(business_name))')
+      .select('*, campaigns(title, per_waver_payout, ends_at, brand_id)')
       .eq('status', 'scheduled')
       .lte('scheduled_at', new Date().toISOString())
       .limit(50)
@@ -64,6 +65,36 @@ Deno.serve(async (req) => {
         JSON.stringify({ processed: 0, message: 'No reminders due' }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
+    }
+
+    const waverIds = [...new Set(reminders.map((r: any) => r.waver_id).filter(Boolean))]
+    const brandIds = [...new Set(reminders.map((r: any) => r.campaigns?.brand_id).filter(Boolean))]
+
+    const [{ data: waverProfiles }, { data: brandProfiles }, { data: waverUsers }] = await Promise.all([
+      waverIds.length
+        ? supabase.from('waver_profiles').select('user_id, whatsapp_number').in('user_id', waverIds)
+        : Promise.resolve({ data: [] }),
+      brandIds.length
+        ? supabase.from('brand_profiles').select('user_id, business_name').in('user_id', brandIds)
+        : Promise.resolve({ data: [] }),
+      waverIds.length
+        ? supabase.from('users').select('id, full_name').in('id', waverIds)
+        : Promise.resolve({ data: [] }),
+    ])
+
+    const waverMap = new Map((waverProfiles || []).map((p: any) => [p.user_id, p]))
+    const brandMap = new Map((brandProfiles || []).map((b: any) => [b.user_id, b]))
+    const userMap = new Map((waverUsers || []).map((u: any) => [u.id, u]))
+
+    for (const reminder of reminders) {
+      ;(reminder as any).waver_profiles = {
+        ...(waverMap.get((reminder as any).waver_id) || {}),
+        users: userMap.get((reminder as any).waver_id) || null,
+      }
+      if ((reminder as any).campaigns) {
+        ;(reminder as any).campaigns.brand_profiles =
+          brandMap.get((reminder as any).campaigns.brand_id) || null
+      }
     }
 
     let processed = 0

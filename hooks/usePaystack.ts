@@ -108,8 +108,55 @@ export function usePaystack() {
     []
   );
 
+  // ─── Web: open Paystack inline checkout directly in the page ───
+  // (react-native-webview's postMessage bridge doesn't exist on web,
+  // but Paystack's inline.js runs natively in browsers.)
+  const payOnWeb = useCallback(
+    (email: string, amount: number, reference: string): Promise<string> => {
+      return new Promise((resolve, reject) => {
+        const w = globalThis as any;
+        if (!w.window || !w.document) {
+          reject(new Error('Web payments require a browser'));
+          return;
+        }
+        if (!PAYSTACK_PUBLIC_KEY) {
+          reject(new Error('Paystack public key is not configured'));
+          return;
+        }
+
+        const openCheckout = () => {
+          try {
+            w.PaystackPop.setup({
+              key: PAYSTACK_PUBLIC_KEY,
+              email,
+              amount: amount * 100,
+              ref: reference,
+              onClose: () => reject(new Error('Payment cancelled')),
+              callback: (response: any) => resolve(response.reference),
+            }).openIframe();
+          } catch (err) {
+            reject(err instanceof Error ? err : new Error('Payment failed'));
+          }
+        };
+
+        if (w.PaystackPop) {
+          openCheckout();
+          return;
+        }
+        const script = w.document.createElement('script');
+        script.src = 'https://js.paystack.co/v1/inline.js';
+        script.async = true;
+        script.onload = openCheckout;
+        script.onerror = () => reject(new Error('Could not load Paystack checkout'));
+        w.document.body.appendChild(script);
+      });
+    },
+    []
+  );
+
   return {
     initializePayment,
     initializeSubscription,
+    payOnWeb,
   };
 }

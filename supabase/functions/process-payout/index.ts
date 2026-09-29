@@ -46,10 +46,11 @@ Deno.serve(async (req) => {
       )
     }
 
-    // Get assignment details
+    // Get assignment details (campaigns.brand_id -> users, so brand/waver
+    // profiles can't be embedded directly — attach with follow-up queries)
     const { data: assignment, error: assignmentError } = await supabase
       .from('campaign_assignments')
-      .select('*, campaigns!inner(title, brand_profiles!inner(business_name)), waver_profiles!inner(paystack_recipient_code, wallet_balance, bank_name)')
+      .select('*, campaigns(title, brand_id)')
       .eq('id', assignment_id)
       .single()
 
@@ -59,6 +60,21 @@ Deno.serve(async (req) => {
         { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
+
+    const { data: waverProfile } = await supabase
+      .from('waver_profiles')
+      .select('paystack_recipient_code, wallet_balance, bank_name')
+      .eq('user_id', assignment.waver_id)
+      .maybeSingle()
+
+    if (!waverProfile) {
+      return new Response(
+        JSON.stringify({ error: 'Waver profile not found' }),
+        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    assignment.waver_profiles = waverProfile
 
     if (assignment.status !== 'proof_approved') {
       return new Response(

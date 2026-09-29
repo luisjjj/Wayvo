@@ -1,4 +1,5 @@
 import 'react-native-url-polyfill/auto';
+import { Platform } from 'react-native';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import * as SecureStore from 'expo-secure-store';
 
@@ -14,6 +15,33 @@ const ExpoSecureStoreAdapter = {
     await SecureStore.deleteItemAsync(key);
   },
 };
+
+// expo-secure-store has no web implementation — use localStorage there.
+const WebStorageAdapter = {
+  getItem: async (key: string) => {
+    try {
+      return (globalThis as any).localStorage?.getItem(key) ?? null;
+    } catch {
+      return null;
+    }
+  },
+  setItem: async (key: string, value: string) => {
+    try {
+      (globalThis as any).localStorage?.setItem(key, value);
+    } catch {
+      // storage unavailable (private mode etc.) — session just won't persist
+    }
+  },
+  removeItem: async (key: string) => {
+    try {
+      (globalThis as any).localStorage?.removeItem(key);
+    } catch {
+      // ignore
+    }
+  },
+};
+
+const authStorage = Platform.OS === 'web' ? WebStorageAdapter : ExpoSecureStoreAdapter;
 
 let _supabase: SupabaseClient | null = null;
 
@@ -33,7 +61,7 @@ export function getSupabase(): SupabaseClient {
       supabaseAnonKey || 'placeholder-key',
       {
         auth: {
-          storage: ExpoSecureStoreAdapter,
+          storage: authStorage,
           autoRefreshToken: true,
           persistSession: true,
           detectSessionInUrl: false,

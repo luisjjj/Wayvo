@@ -1,9 +1,11 @@
 import React from 'react';
-import { View, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import { colors } from '@/constants/colors';
+import { FontFamily } from '@/constants/fonts';
 
 interface TabItem {
   key: string;
+  label: string;
   icon: React.ReactNode;
   onPress: () => void;
 }
@@ -18,9 +20,12 @@ function TabButton({ tab, isActive }: { tab: TabItem; isActive: boolean }) {
     <TouchableOpacity
       onPress={tab.onPress}
       activeOpacity={0.7}
-      style={[styles.tab, isActive && styles.activeTab]}
+      style={styles.tab}
     >
       {tab.icon}
+      <Text style={[styles.label, isActive && styles.labelActive]}>
+        {tab.label.toUpperCase()}
+      </Text>
     </TouchableOpacity>
   );
 }
@@ -28,7 +33,7 @@ function TabButton({ tab, isActive }: { tab: TabItem; isActive: boolean }) {
 export function FloatingTabBar({ tabs, activeTab }: FloatingTabBarProps) {
   return (
     <View style={styles.container}>
-      <View style={styles.pill}>
+      <View style={styles.bar}>
         {tabs.map((tab) => (
           <TabButton
             key={tab.key}
@@ -44,38 +49,33 @@ export function FloatingTabBar({ tabs, activeTab }: FloatingTabBarProps) {
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    bottom: Platform.OS === 'ios' ? 32 : 24,
+    bottom: 0,
     left: 0,
     right: 0,
-    alignItems: 'center',
+    backgroundColor: colors.white,
+    borderTopWidth: 1,
+    borderTopColor: colors.glass.border,
+    paddingBottom: Platform.OS === 'ios' ? 24 : 12,
+    paddingTop: 8,
     zIndex: 100,
   },
-  pill: {
+  bar: {
     flexDirection: 'row',
-    backgroundColor: 'rgba(18, 18, 31, 0.92)',
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.10)',
-    paddingHorizontal: 8,
-    paddingVertical: 8,
-    gap: 4,
-    ...(Platform.OS === 'ios'
-      ? {
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: 8 },
-          shadowOpacity: 0.3,
-          shadowRadius: 24,
-        }
-      : { elevation: 16 }),
   },
   tab: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    gap: 4,
+    paddingVertical: 4,
   },
-  activeTab: {
-    backgroundColor: 'rgba(255, 77, 0, 0.2)',
+  label: {
+    fontFamily: FontFamily.medium,
+    fontSize: 9,
+    letterSpacing: 1.5,
+    color: '#999999',
+  },
+  labelActive: {
+    color: colors.black,
   },
 });

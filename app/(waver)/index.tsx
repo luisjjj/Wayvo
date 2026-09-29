@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, RefreshControl } from 'react-native';
 import { router } from 'expo-router';
 import { colors } from '@/constants/colors';
@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/Badge';
 import { InboxIcon } from '@/components/icons';
 import { useAuth } from '@/hooks/useAuth';
 import { useCampaigns } from '@/hooks/useCampaigns';
+import { rankCampaignsForWaver } from '@/lib/matching';
 
 export default function WaverHomeScreen() {
   const { user, waverProfile } = useAuth();
@@ -29,9 +30,21 @@ export default function WaverHomeScreen() {
     setRefreshing(false);
   };
 
-  const filteredCampaigns = selectedPlatform
-    ? campaigns.filter((c) => c.platforms.includes(selectedPlatform))
-    : campaigns;
+  const filteredCampaigns = useMemo(() => {
+    const base = selectedPlatform
+      ? campaigns.filter((c) => c.platforms.includes(selectedPlatform))
+      : campaigns;
+    if (!user || !waverProfile) return base.map((c) => ({ ...c, match_score: 0 }));
+    return rankCampaignsForWaver(base, {
+      user_id: user.id,
+      wayvo_score: waverProfile.wayvo_score,
+      completion_rate: waverProfile.completion_rate,
+      avg_views: waverProfile.avg_views,
+      platforms: waverProfile.platforms || [],
+      niche_tags: waverProfile.niche_tags || [],
+      full_name: user.full_name,
+    });
+  }, [campaigns, selectedPlatform, user, waverProfile]);
 
   const firstName = user?.full_name?.split(' ')[0] || 'Waver';
 
@@ -43,6 +56,7 @@ export default function WaverHomeScreen() {
     >
       <View style={styles.header}>
         <View>
+          <Text style={styles.eyebrow}>Waver</Text>
           <Text style={styles.greeting}>Hey, {firstName}</Text>
           <Text style={styles.subGreeting}>Ready to earn today?</Text>
         </View>
@@ -100,6 +114,7 @@ export default function WaverHomeScreen() {
             <CampaignCard
               key={campaign.id}
               campaign={campaign}
+              matchScore={(campaign as any).match_score ?? null}
               onPress={() => router.push(`/(waver)/campaigns/${campaign.id}`)}
             />
           ))
@@ -129,9 +144,16 @@ const styles = StyleSheet.create({
   },
   greeting: {
     fontFamily: typography.fontFamily.displayBold,
-    fontWeight: '700',
-    fontSize: typography.fontSize['2xl'],
+    fontSize: 34,
+    letterSpacing: -0.5,
     color: colors.text.primary,
+  },
+  eyebrow: {
+    fontFamily: typography.fontFamily.medium,
+    fontSize: 11,
+    letterSpacing: 2.5,
+    color: colors.text.tertiary,
+    marginBottom: 6,
   },
   subGreeting: {
     fontFamily: typography.fontFamily.regular,
@@ -149,8 +171,9 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   sectionTitle: {
-    fontFamily: typography.fontFamily.display,
+    fontFamily: typography.fontFamily.displayBold,
     fontSize: typography.fontSize.lg,
+    letterSpacing: 0.5,
     color: colors.text.primary,
   },
   filters: {

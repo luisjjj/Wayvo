@@ -1,24 +1,49 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { router } from 'expo-router';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { router, useLocalSearchParams } from 'expo-router';
 import { colors } from '@/constants/colors';
 import { typography } from '@/constants/typography';
 import { WalletIcon, TargetIcon } from '@/components/icons';
 import { useAuth } from '@/hooks/useAuth';
 
 export default function ModeSelectScreen() {
+  const { mode } = useLocalSearchParams<{ mode?: string }>();
   const { updateProfile } = useAuth();
   const [error, setError] = useState('');
+  const [selecting, setSelecting] = useState(false);
+  const autoSelected = useRef(false);
 
   const selectMode = async (mode: 'waver' | 'brand') => {
+    if (selecting) return;
+    setSelecting(true);
     try {
       await updateProfile({ active_mode: mode });
     } catch (err: any) {
       setError(err.message || 'Failed to save');
+      setSelecting(false);
       return;
     }
     router.replace(`/(auth)/profile-setup?mode=${mode}`);
   };
+
+  // Role pre-selected on onboarding (For Brands / For Wavers cards) —
+  // skip the question and continue straight to profile setup.
+  const preselected = mode === 'waver' || mode === 'brand';
+  useEffect(() => {
+    if (!autoSelected.current && preselected) {
+      autoSelected.current = true;
+      selectMode(mode);
+    }
+  }, [mode]);
+
+  // Don't flash the role cards while auto-continuing.
+  if (preselected && !error) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={colors.accent.primary} />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -65,6 +90,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background.primary,
   },
+  loadingContainer: {
+    flex: 1,
+    backgroundColor: colors.background.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   content: {
     flex: 1,
     paddingHorizontal: 24,
@@ -85,7 +116,7 @@ const styles = StyleSheet.create({
   },
   modeCard: {
     backgroundColor: colors.glass.bg,
-    borderRadius: 20,
+    borderRadius: 0,
     borderWidth: 1,
     borderColor: colors.glass.border,
     padding: 24,

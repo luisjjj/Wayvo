@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { colors } from '@/constants/colors';
 import { typography } from '@/constants/typography';
 import { GlassCard } from '@/components/ui/GlassCard';
@@ -13,9 +12,10 @@ import { Campaign } from '@/types/database';
 interface CampaignCardProps {
   campaign: Campaign & { brand_profiles?: { business_name: string; logo_url: string | null } };
   onPress: () => void;
+  matchScore?: number | null;
 }
 
-export function CampaignCard({ campaign, onPress }: CampaignCardProps) {
+export function CampaignCard({ campaign, onPress, matchScore = null }: CampaignCardProps) {
   const slotsFilled = campaign.num_wavers;
   const progress = Math.min(slotsFilled / (campaign.num_wavers + 2), 1);
 
@@ -37,21 +37,20 @@ export function CampaignCard({ campaign, onPress }: CampaignCardProps) {
           />
           <View style={styles.headerInfo}>
             <Text style={styles.brandName}>
-              {campaign.brand_profiles?.business_name || 'Brand'}
+              {(campaign.brand_profiles?.business_name || 'Brand').toUpperCase()}
             </Text>
             <Text style={styles.title} numberOfLines={1}>
               {campaign.title}
             </Text>
+            {matchScore !== null && matchScore > 0 && (
+              <Text style={styles.matchText}>{matchScore}% MATCH FOR YOU</Text>
+            )}
           </View>
-          <View style={styles.payoutBadge}>
-            <LinearGradient
-              colors={[colors.semantic.success, '#009966']}
-              style={styles.payoutGradient}
-            >
-              <Text style={styles.payoutText}>
-                ₦{campaign.per_waver_payout.toLocaleString()}
-              </Text>
-            </LinearGradient>
+          <View style={styles.payoutBlock}>
+            <Text style={styles.payoutValue}>
+              ₦{campaign.per_waver_payout.toLocaleString()}
+            </Text>
+            <Text style={styles.payoutLabel}>Per post</Text>
           </View>
         </View>
 
@@ -65,20 +64,12 @@ export function CampaignCard({ campaign, onPress }: CampaignCardProps) {
           <ProgressBar progress={progress} />
           <View style={styles.progressInfo}>
             <Text style={styles.progressText}>
-              {slotsFilled} Wavers assigned
+              {slotsFilled} WAVERS ASSIGNED
             </Text>
             {hoursLeft !== null && (
-              <View style={styles.deadlineRow}>
-                {isUrgent && <View style={styles.urgentDot} />}
-                <Text
-                  style={[
-                    styles.deadlineText,
-                    isUrgent && styles.deadlineUrgent,
-                  ]}
-                >
-                  {hoursLeft}h left
-                </Text>
-              </View>
+              <Text style={[styles.deadlineText, isUrgent && styles.deadlineUrgent]}>
+                {isUrgent ? 'ENDING SOON · ' : ''}{hoursLeft}H LEFT
+              </Text>
             )}
           </View>
         </View>
@@ -102,27 +93,39 @@ const styles = StyleSheet.create({
   },
   brandName: {
     fontFamily: typography.fontFamily.medium,
-    fontSize: typography.fontSize.sm,
-    color: colors.text.secondary,
+    fontSize: 10,
+    letterSpacing: 2,
+    color: colors.text.tertiary,
+    marginBottom: 2,
   },
   title: {
-    fontFamily: typography.fontFamily.medium,
+    fontFamily: typography.fontFamily.displayBold,
     fontSize: typography.fontSize.base,
     color: colors.text.primary,
   },
-  payoutBadge: {
-    borderRadius: 12,
-    overflow: 'hidden',
+  payoutBlock: {
+    alignItems: 'flex-end',
+    borderLeftWidth: 1,
+    borderLeftColor: colors.glass.border,
+    paddingLeft: 12,
   },
-  payoutGradient: {
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 12,
-  },
-  payoutText: {
+  payoutValue: {
     fontFamily: typography.fontFamily.displayBold,
-    fontSize: typography.fontSize.sm,
-    color: colors.text.inverse,
+    fontSize: typography.fontSize.base,
+    color: colors.black,
+  },
+  payoutLabel: {
+    fontFamily: typography.fontFamily.regular,
+    fontSize: 10,
+    letterSpacing: 1.5,
+    color: colors.text.tertiary,
+  },
+  matchText: {
+    fontFamily: typography.fontFamily.medium,
+    fontSize: 10,
+    letterSpacing: 1.5,
+    color: colors.accent.primary,
+    marginTop: 2,
   },
   platforms: {
     flexDirection: 'row',
@@ -140,26 +143,17 @@ const styles = StyleSheet.create({
   },
   progressText: {
     fontFamily: typography.fontFamily.regular,
-    fontSize: typography.fontSize.xs,
+    fontSize: 10,
+    letterSpacing: 1.5,
     color: colors.text.tertiary,
-  },
-  deadlineRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  urgentDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: colors.semantic.danger,
   },
   deadlineText: {
     fontFamily: typography.fontFamily.medium,
-    fontSize: typography.fontSize.xs,
+    fontSize: 10,
+    letterSpacing: 1.5,
     color: colors.text.tertiary,
   },
   deadlineUrgent: {
-    color: colors.semantic.warning,
+    color: colors.semantic.danger,
   },
 });

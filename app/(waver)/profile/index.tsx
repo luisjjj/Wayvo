@@ -71,7 +71,7 @@ export default function WaverProfileScreen() {
 
       <Button
         title="Sign Out"
-        onPress={signOut}
+        onPress={async () => { await signOut(); router.replace('/(auth)/onboarding'); }}
         variant="ghost"
         fullWidth
         style={styles.signOutButton}

@@ -78,7 +78,7 @@ export function CampaignTracker({
 
       <ProgressBar
         progress={assignments.length > 0 ? proofCount / assignments.length : 0}
-        color="#4ADE80"
+        color={colors.semantic.success}
       />
 
       <View style={styles.waverList}>
@@ -122,7 +122,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 12,
     backgroundColor: colors.glass.bg,
-    borderRadius: 12,
+    borderRadius: 0,
+    borderWidth: 1,
+    borderColor: colors.glass.borderSubtle,
   },
   statValue: {
     fontFamily: typography.fontFamily.displayBold,

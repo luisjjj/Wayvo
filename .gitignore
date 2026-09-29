@@ -1,6 +1,9 @@
 node_modules/
 .expo/
 dist/
+.vercel/
+android/
+ios/
 *.jks
 *.p8
 *.p12

@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { colors } from '@/constants/colors';
 import { typography } from '@/constants/typography';
 import { GlassCard } from '@/components/ui/GlassCard';
@@ -22,48 +21,33 @@ export function WayvoScoreCard({
   avgViews,
   totalEarned,
 }: WayvoScoreCardProps) {
-  const scorePercent = score / 1000;
-
   return (
-    <GlassCard variant="elevated" style={styles.card}>
-      <View style={styles.edgeTop} />
-      <LinearGradient
-        colors={[colors.accent.primary, colors.accent.secondary]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.scoreSection}
-      >
-        <Text style={styles.scoreLabel}>Wayvo Score</Text>
-        <View style={styles.scoreRow}>
-          <Text style={styles.scoreValue}>{score}</Text>
-          <Text style={styles.scoreMax}>/ 1000</Text>
-        </View>
-        <View style={styles.rankBadge}>
-          <Text style={styles.rankText}>{rank}</Text>
-        </View>
-      </LinearGradient>
+    <GlassCard style={styles.card}>
+      <Text style={styles.eyebrow}>Wayvo Score</Text>
+      <View style={styles.scoreRow}>
+        <Text style={styles.scoreValue}>{score}</Text>
+        <Text style={styles.scoreMax}>/ 1000</Text>
+      </View>
+      <Text style={styles.rankText}>{rank.toUpperCase()}</Text>
+
+      <View style={styles.divider} />
 
       <View style={styles.statsRow}>
         <View style={styles.stat}>
           <Text style={styles.statValue}>{campaignsCompleted}</Text>
-          <Text style={styles.statLabel}>Campaigns</Text>
+          <Text style={styles.statLabel}>CAMPAIGNS</Text>
         </View>
-        <View style={styles.statDivider} />
         <View style={styles.stat}>
           <Text style={styles.statValue}>{completionRate}%</Text>
-          <Text style={styles.statLabel}>Completion</Text>
+          <Text style={styles.statLabel}>COMPLETION</Text>
         </View>
-        <View style={styles.statDivider} />
         <View style={styles.stat}>
           <Text style={styles.statValue}>{avgViews.toLocaleString()}</Text>
-          <Text style={styles.statLabel}>Avg Views</Text>
+          <Text style={styles.statLabel}>AVG VIEWS</Text>
         </View>
-        <View style={styles.statDivider} />
         <View style={styles.stat}>
-          <Text style={[styles.statValue, { color: colors.semantic.success }]}>
-            ₦{totalEarned.toLocaleString()}
-          </Text>
-          <Text style={styles.statLabel}>Earned</Text>
+          <Text style={styles.statValue}>₦{totalEarned.toLocaleString()}</Text>
+          <Text style={styles.statLabel}>EARNED</Text>
         </View>
       </View>
     </GlassCard>
@@ -72,81 +56,60 @@ export function WayvoScoreCard({
 
 const styles = StyleSheet.create({
   card: {
-    padding: 0,
-    overflow: 'hidden',
-  },
-  edgeTop: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 1,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    zIndex: 1,
-  },
-  scoreSection: {
     padding: 20,
-    borderBottomLeftRadius: 0,
-    borderBottomRightRadius: 0,
   },
-  scoreLabel: {
-    fontFamily: typography.fontFamily.regular,
-    fontSize: typography.fontSize.sm,
-    color: 'rgba(255,255,255,0.8)',
+  eyebrow: {
+    fontFamily: typography.fontFamily.medium,
+    fontSize: 11,
+    letterSpacing: 2.5,
+    color: colors.text.tertiary,
     marginBottom: 4,
   },
   scoreRow: {
     flexDirection: 'row',
     alignItems: 'baseline',
-    gap: 4,
+    gap: 6,
   },
   scoreValue: {
     fontFamily: typography.fontFamily.displayBold,
-    fontSize: typography.fontSize['4xl'],
-    color: colors.white,
+    fontSize: 56,
+    lineHeight: 60,
+    color: colors.black,
+    letterSpacing: -1,
   },
   scoreMax: {
     fontFamily: typography.fontFamily.regular,
     fontSize: typography.fontSize.lg,
-    color: 'rgba(255,255,255,0.6)',
-  },
-  rankBadge: {
-    alignSelf: 'flex-start',
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-    marginTop: 8,
+    color: colors.text.tertiary,
   },
   rankText: {
     fontFamily: typography.fontFamily.medium,
-    fontSize: typography.fontSize.xs,
-    color: colors.white,
+    fontSize: 11,
+    letterSpacing: 2,
+    color: colors.black,
+    marginTop: 4,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: colors.glass.border,
+    marginVertical: 16,
   },
   statsRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-    backgroundColor: colors.glass.bg,
   },
   stat: {
     flex: 1,
-    alignItems: 'center',
   },
   statValue: {
     fontFamily: typography.fontFamily.displayBold,
     fontSize: typography.fontSize.base,
     color: colors.text.primary,
-    marginBottom: 2,
+    marginBottom: 4,
   },
   statLabel: {
     fontFamily: typography.fontFamily.regular,
-    fontSize: typography.fontSize.xs,
+    fontSize: 9,
+    letterSpacing: 1.5,
     color: colors.text.tertiary,
-  },
-  statDivider: {
-    width: 1,
-    height: 24,
-    backgroundColor: colors.glass.border,
   },
 });

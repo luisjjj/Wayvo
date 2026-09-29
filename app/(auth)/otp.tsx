@@ -8,7 +8,8 @@ import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/hooks/useAuth';
 
 export default function OTPVerificationScreen() {
-  const { phone } = useLocalSearchParams<{ phone: string }>();
+  const { phone, mode } = useLocalSearchParams<{ phone: string; mode?: string }>();
+  const role = mode === 'brand' || mode === 'waver' ? mode : undefined;
   const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -25,7 +26,7 @@ export default function OTPVerificationScreen() {
 
     try {
       await verifyOtp(phone!, otp);
-      router.replace('/(auth)/mode-select');
+      router.replace(role ? { pathname: '/(auth)/mode-select', params: { mode: role } } : '/(auth)/mode-select');
     } catch (err: any) {
       setError(err.message || 'Invalid OTP');
     } finally {

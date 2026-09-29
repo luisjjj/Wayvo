@@ -32,8 +32,8 @@ export function Avatar({ uri, name, size = 'md', style }: AvatarProps) {
     .slice(0, 2) || '?';
 
   const bgColor = name
-    ? `hsl(${name.charCodeAt(0) * 7 + name.charCodeAt(name.length - 1) * 13}, 45%, 35%)`
-    : 'rgba(255,255,255,0.08)';
+    ? '#F0F0F0'
+    : '#F0F0F0';
 
   if (uri) {
     const imageStyle: ImageStyle = { width: container, height: container, borderRadius: radius };
@@ -65,6 +65,6 @@ const styles = StyleSheet.create({
   },
   text: {
     fontFamily: FontFamily.semibold,
-    color: colors.white,
+    color: colors.black,
   },
 });

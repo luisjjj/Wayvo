@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Platform } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { WebView } from 'react-native-webview';
 import { colors } from '@/constants/colors';
@@ -16,9 +16,10 @@ import { config } from '@/constants/config';
 export default function Step4Screen() {
   const params = useLocalSearchParams();
   const { user } = useAuth();
-  const { createCampaign } = useCampaigns();
-  const { initializePayment } = usePaystack();
+  const { createCampaign, activateCampaign, matchAndAssign } = useCampaigns();
+  const { initializePayment, payOnWeb } = usePaystack();
   const [loading, setLoading] = useState(false);
+  const [payError, setPayError] = useState('');
   const [paymentData, setPaymentData] = useState<any>(null);
   const [createdCampaign, setCreatedCampaign] = useState<any>(null);
 
@@ -64,14 +65,47 @@ export default function Step4Screen() {
 
       setCreatedCampaign(campaign);
 
+      const email = user?.email || `${user?.phone}@wayvo.app`;
+
+      // Web has no WebView postMessage bridge — pay inline in the page.
+      if (Platform.OS === 'web') {
+        try {
+          await payOnWeb(email, budget, reference);
+          await activateCampaign(campaign.id, duration);
+          try {
+            await matchAndAssign(campaign.id);
+          } catch (matchError) {
+            console.error('Fit-engine matching failed:', matchError);
+          }
+          setLoading(false);
+          router.replace('/(brand)');
+        } catch (webPayError: any) {
+          setPayError(webPayError?.message || 'Payment failed. Please try again.');
+          setLoading(false);
+        }
+        return;
+      }
+
       const payment = initializePayment(
-        user?.email || `${user?.phone}@wayvo.app`,
+        email,
         budget,
         reference,
         async (ref) => {
-          // Payment successful
-          setLoading(false);
-          router.replace('/(brand)');
+          // Payment successful → go live immediately so wavers see it,
+          // then run the fit engine to map best-fit wavers.
+          try {
+            await activateCampaign(campaign.id, duration);
+            try {
+              await matchAndAssign(campaign.id);
+            } catch (matchError) {
+              console.error('Fit-engine matching failed:', matchError);
+            }
+          } catch (activateError) {
+            console.error('Campaign activation failed:', activateError);
+          } finally {
+            setLoading(false);
+            router.replace('/(brand)');
+          }
         },
         (error) => {
           setLoading(false);
@@ -150,6 +184,7 @@ export default function Step4Screen() {
         loading={loading}
         fullWidth
       />
+      {payError ? <Text style={styles.payError}>{payError}</Text> : null}
     </ScrollView>
   );
 }
@@ -231,5 +266,11 @@ const styles = StyleSheet.create({
   },
   webview: {
     flex: 1,
+  },
+  payError: {
+    fontFamily: typography.fontFamily.regular,
+    fontSize: typography.fontSize.sm,
+    color: colors.semantic.danger,
+    textAlign: 'center',
   },
 });

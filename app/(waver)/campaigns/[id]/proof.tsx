@@ -82,7 +82,7 @@ export default function ProofSubmissionScreen() {
         <View style={styles.stepLine} />
         <View style={styles.step}>
           <View style={[styles.stepDot, styles.stepDotActive]}>
-            <Text style={styles.stepNumber}>2</Text>
+            <Text style={[styles.stepNumber, styles.stepNumberActive]}>2</Text>
           </View>
           <Text style={styles.stepText}>Submit Proof</Text>
         </View>
@@ -169,6 +169,9 @@ const styles = StyleSheet.create({
   stepNumber: {
     fontFamily: typography.fontFamily.medium,
     fontSize: typography.fontSize.xs,
+    color: colors.text.tertiary,
+  },
+  stepNumberActive: {
     color: colors.white,
   },
   stepText: {

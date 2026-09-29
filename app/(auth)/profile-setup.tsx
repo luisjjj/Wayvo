@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { colors } from '@/constants/colors';
@@ -11,8 +11,7 @@ import { config } from '@/constants/config';
 
 export default function ProfileSetupScreen() {
   const { mode } = useLocalSearchParams<{ mode: string }>();
-  const { user, updateProfile } = useAuth();
-  const [loading, setLoading] = useState(false);
+  const { user, updateProfile } = useAuth();  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   // Waver fields
@@ -28,6 +27,14 @@ export default function ProfileSetupScreen() {
   const [website, setWebsite] = useState('');
 
   const isWaver = mode === 'waver';
+  const isBrand = mode === 'brand';
+
+  // Reject unknown/missing roles instead of silently falling into brand setup.
+  useEffect(() => {
+    if (!isWaver && !isBrand) {
+      router.replace('/(auth)/mode-select');
+    }
+  }, [mode]);
 
   const toggleNiche = (niche: string) => {
     setSelectedNiches((prev) =>
@@ -42,12 +49,17 @@ export default function ProfileSetupScreen() {
   };
 
   const handleComplete = async () => {
+    if (!isWaver && !isBrand) {
+      router.replace('/(auth)/mode-select');
+      return;
+    }
     setLoading(true);
     setError('');
 
     try {
       await updateProfile({
         full_name: isWaver ? fullName : businessName,
+        active_mode: isWaver ? 'waver' : 'brand',
         is_waver: isWaver,
         is_brand: !isWaver,
       });
@@ -111,6 +123,10 @@ export default function ProfileSetupScreen() {
       setLoading(false);
     }
   };
+
+  if (!isWaver && !isBrand) {
+    return null;
+  }
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>

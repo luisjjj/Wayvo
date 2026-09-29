@@ -1,33 +1,47 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { router } from 'expo-router';
 import { colors } from '@/constants/colors';
 import { typography } from '@/constants/typography';
 import { Button } from '@/components/ui/Button';
-import { TargetIcon, WalletIcon, WayvoLogo } from '@/components/icons';
 
 export default function OnboardingScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.background}>
         <View style={styles.content}>
-          <WayvoLogo size={80} />
-          <Text style={styles.title}>Wayvo</Text>
+          <Text style={styles.eyebrow}>Micro-Influencer Marketplace</Text>
+          <Text style={styles.title}>WAYVO</Text>
+          <View style={styles.rule} />
           <Text style={styles.subtitle}>
-            Connect with real people.{'\n'}Real reach. Real results.
+            Real people. Real reach.{'\n'}Real results.
           </Text>
 
+          <Text style={styles.roleHint}>Choose your path to continue</Text>
           <View style={styles.features}>
-            <View style={styles.feature}>
-              <TargetIcon size={32} color={colors.accent.primary} />
+            <TouchableOpacity
+              style={styles.feature}
+              activeOpacity={0.7}
+              onPress={() => router.push({ pathname: '/(auth)/phone', params: { mode: 'brand' } })}
+            >
               <Text style={styles.featureText}>For Brands</Text>
-              <Text style={styles.featureDesc}>Run campaigns with real micro-influencers</Text>
-            </View>
-            <View style={styles.feature}>
-              <WalletIcon size={32} color={colors.accent.primary} />
+              <Text style={styles.featureDesc}>
+                Run campaigns with real micro-influencers
+              </Text>
+              <Text style={styles.featureCta}>Continue →</Text>
+            </TouchableOpacity>
+            <View style={styles.featureDivider} />
+            <TouchableOpacity
+              style={styles.feature}
+              activeOpacity={0.7}
+              onPress={() => router.push({ pathname: '/(auth)/phone', params: { mode: 'waver' } })}
+            >
               <Text style={styles.featureText}>For Wavers</Text>
-              <Text style={styles.featureDesc}>Earn by posting to your existing audience</Text>
-            </View>
+              <Text style={styles.featureDesc}>
+                Earn by posting to your existing audience
+              </Text>
+              <Text style={styles.featureCta}>Continue →</Text>
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -56,55 +70,88 @@ const styles = StyleSheet.create({
   },
   background: {
     flex: 1,
-    backgroundColor: colors.black,
+    backgroundColor: colors.white,
     justifyContent: 'space-between',
     paddingHorizontal: 24,
-    paddingTop: 80,
+    paddingTop: 100,
     paddingBottom: 48,
   },
   content: {
     alignItems: 'center',
   },
+  eyebrow: {
+    fontFamily: typography.fontFamily.medium,
+    fontSize: 11,
+    letterSpacing: 3,
+    color: colors.accent.primary,
+    marginBottom: 12,
+  },
   title: {
-    fontFamily: typography.fontFamily.displayBold,
-    fontWeight: '700',
-    fontSize: typography.fontSize['4xl'],
-    color: colors.white,
-    marginBottom: 16,
+    fontFamily: typography.fontFamily.display,
+    fontSize: 72,
+    letterSpacing: 6,
+    color: colors.black,
+    textAlign: 'center',
+  },
+  rule: {
+    width: 48,
+    height: 2,
+    backgroundColor: colors.accent.primary,
+    marginVertical: 24,
   },
   subtitle: {
     fontFamily: typography.fontFamily.regular,
-    fontSize: typography.fontSize.lg,
-    color: 'rgba(255,255,255,0.75)',
+    fontSize: typography.fontSize.base,
+    color: colors.text.secondary,
     textAlign: 'center',
-    lineHeight: 28,
+    lineHeight: 26,
+  },
+  roleHint: {
+    fontFamily: typography.fontFamily.medium,
+    fontSize: 11,
+    letterSpacing: 2.5,
+    color: colors.text.tertiary,
+    marginTop: 40,
   },
   features: {
     flexDirection: 'row',
-    gap: 24,
-    marginTop: 64,
+    marginTop: 16,
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: colors.glass.border,
   },
   feature: {
     flex: 1,
     alignItems: 'center',
-    backgroundColor: colors.background.surface,
-    borderRadius: 20,
-    padding: 20,
+    paddingVertical: 24,
+    paddingHorizontal: 12,
+  },
+  featureDivider: {
+    width: 1,
+    backgroundColor: colors.glass.border,
   },
   featureText: {
     fontFamily: typography.fontFamily.medium,
-    fontSize: typography.fontSize.base,
-    color: colors.accent.primary,
-    marginBottom: 4,
+    fontSize: 11,
+    letterSpacing: 2,
+    color: colors.black,
+    marginBottom: 8,
   },
   featureDesc: {
     fontFamily: typography.fontFamily.regular,
     fontSize: typography.fontSize.xs,
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.text.tertiary,
     textAlign: 'center',
     lineHeight: 18,
   },
+  featureCta: {
+    fontFamily: typography.fontFamily.medium,
+    fontSize: 11,
+    letterSpacing: 1.5,
+    color: colors.accent.primary,
+    marginTop: 12,
+  },
   buttons: {
-    gap: 12,
+    gap: 4,
   },
 });

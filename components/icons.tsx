@@ -1,5 +1,5 @@
 import React from 'react';
-import Svg, { Path, Circle, Rect, G, Defs, LinearGradient, Stop } from 'react-native-svg';
+import Svg, { Path, Circle, Rect, G } from 'react-native-svg';
 
 type IconProps = {
   size?: number;
@@ -11,15 +11,9 @@ type IconProps = {
 export function WayvoLogo({ size = 48 }: { size?: number }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 48 48" fill="none">
-      <Defs>
-        <LinearGradient id="logoGrad" x1="0" y1="0" x2="48" y2="48">
-          <Stop offset="0%" stopColor="#FF4D00" />
-          <Stop offset="100%" stopColor="#FC5C7D" />
-        </LinearGradient>
-      </Defs>
       <Path
         d="M8 12L16 36L24 20L32 36L40 12"
-        stroke="url(#logoGrad)"
+        stroke="#000000"
         strokeWidth="4"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -29,7 +23,7 @@ export function WayvoLogo({ size = 48 }: { size?: number }) {
 }
 
 // ─── Wayvo Logo Mark (small) ───
-export function WayvoMark({ size = 24, color = '#FF4D00' }: { size?: number; color?: string }) {
+export function WayvoMark({ size = 24, color = '#000000' }: { size?: number; color?: string }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path

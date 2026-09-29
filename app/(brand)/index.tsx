@@ -38,7 +38,8 @@ export default function BrandDashboardScreen() {
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <View style={styles.header}>
         <View>
-          <Text style={styles.greeting}>Hey, {brandProfile?.business_name || 'Brand'}</Text>
+          <Text style={styles.eyebrow}>Brand Studio</Text>
+          <Text style={styles.greeting}>{brandProfile?.business_name || 'Brand'}</Text>
           <Text style={styles.subGreeting}>Here's your campaign overview</Text>
         </View>
         <Button
@@ -131,9 +132,16 @@ const styles = StyleSheet.create({
   },
   greeting: {
     fontFamily: typography.fontFamily.displayBold,
-    fontWeight: '700',
-    fontSize: typography.fontSize['2xl'],
+    fontSize: 34,
+    letterSpacing: -0.5,
     color: colors.text.primary,
+  },
+  eyebrow: {
+    fontFamily: typography.fontFamily.medium,
+    fontSize: 11,
+    letterSpacing: 2.5,
+    color: colors.text.tertiary,
+    marginBottom: 6,
   },
   subGreeting: {
     fontFamily: typography.fontFamily.regular,
@@ -170,8 +178,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   sectionTitle: {
-    fontFamily: typography.fontFamily.display,
+    fontFamily: typography.fontFamily.displayBold,
     fontSize: typography.fontSize.lg,
+    letterSpacing: 0.5,
     color: colors.text.primary,
   },
   campaignCard: {

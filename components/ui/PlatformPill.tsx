@@ -10,8 +10,6 @@ import {
   YouTubeIcon,
 } from '@/components/icons';
 
-type PlatformType = 'instagram' | 'tiktok' | 'whatsapp' | 'facebook' | 'youtube';
-
 interface PlatformPillProps {
   platform: string;
   label?: string;
@@ -33,13 +31,13 @@ export function PlatformPill({ platform, label, style }: PlatformPillProps) {
     <View
       style={[
         styles.pill,
-        { backgroundColor: `${config.color}15`, borderColor: `${config.color}30` },
+        { backgroundColor: `${config.color}0D`, borderColor: `${config.color}30` },
         style,
       ]}
     >
       <config.Icon size={12} color={config.color} />
       <Text style={[styles.text, { color: config.color }]}>
-        {label || config.label}
+        {(label || config.label).toUpperCase()}
       </Text>
     </View>
   );
@@ -51,13 +49,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 10,
     paddingVertical: 5,
-    borderRadius: 20,
+    borderRadius: 0,
     borderWidth: 1,
-    gap: 4,
+    gap: 6,
   },
   text: {
     fontFamily: FontFamily.medium,
-    fontSize: 12,
-    letterSpacing: 0.1,
+    fontSize: 10,
+    letterSpacing: 1.5,
   },
 });

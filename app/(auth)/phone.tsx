@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { colors } from '@/constants/colors';
 import { typography } from '@/constants/typography';
 import { Input } from '@/components/ui/Input';
@@ -12,6 +12,8 @@ import { useAuth } from '@/hooks/useAuth';
 type AuthMode = 'phone' | 'email_signin' | 'email_signup';
 
 export default function PhoneInputScreen() {
+  const { mode } = useLocalSearchParams<{ mode?: string }>();
+  const role = mode === 'brand' || mode === 'waver' ? mode : undefined;
   const { sendOtp, signInWithEmail, signUpWithEmail } = useAuth();
   const [authMode, setAuthMode] = useState<AuthMode>('phone');
   const [loading, setLoading] = useState(false);
@@ -36,7 +38,7 @@ export default function PhoneInputScreen() {
 
     try {
       await sendOtp(phone);
-      router.push({ pathname: '/(auth)/otp', params: { phone } });
+      router.push({ pathname: '/(auth)/otp', params: role ? { phone, mode: role } : { phone } });
     } catch (err: any) {
       setError(err.message || 'Failed to send OTP');
     } finally {
@@ -55,7 +57,7 @@ export default function PhoneInputScreen() {
 
     try {
       await signInWithEmail(email, password);
-      router.replace('/(auth)/mode-select');
+      router.replace(role ? { pathname: '/(auth)/mode-select', params: { mode: role } } : '/(auth)/mode-select');
     } catch (err: any) {
       setError(err.message || 'Sign in failed');
     } finally {
@@ -79,7 +81,7 @@ export default function PhoneInputScreen() {
 
     try {
       await signUpWithEmail(email, password, fullName);
-      router.replace('/(auth)/mode-select');
+      router.replace(role ? { pathname: '/(auth)/mode-select', params: { mode: role } } : '/(auth)/mode-select');
     } catch (err: any) {
       setError(err.message || 'Sign up failed');
     } finally {

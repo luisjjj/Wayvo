@@ -33,7 +33,7 @@ export function Input({
 
   return (
     <View style={[styles.container, containerStyle]}>
-      {label && <Text style={styles.label}>{label}</Text>}
+      {label && <Text style={styles.label}>{label.toUpperCase()}</Text>}
       <View
         style={[
           styles.inputWrapper,
@@ -49,7 +49,7 @@ export function Input({
             rightIcon ? styles.inputWithRightIcon : undefined,
             style,
           ]}
-          placeholderTextColor="rgba(240,238,255,0.25)"
+          placeholderTextColor="rgba(0,0,0,0.32)"
           onFocus={(e) => {
             setIsFocused(true);
             onFocus?.(e);
@@ -69,52 +69,51 @@ export function Input({
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 16,
+    marginBottom: 20,
   },
   label: {
     fontFamily: FontFamily.medium,
-    fontSize: 13,
-    color: colors.text.secondary,
-    marginBottom: 6,
-    letterSpacing: 0.1,
+    fontSize: 11,
+    color: colors.text.tertiary,
+    marginBottom: 2,
+    letterSpacing: 2,
   },
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.04)',
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+    backgroundColor: 'transparent',
+    borderRadius: 0,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.glass.border,
   },
   inputWrapperFocused: {
-    borderColor: colors.accent.primary,
-    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderBottomColor: colors.black,
   },
   inputWrapperError: {
-    borderColor: colors.semantic.danger,
+    borderBottomColor: colors.semantic.danger,
   },
   input: {
     flex: 1,
     fontFamily: FontFamily.regular,
     fontSize: 15,
     color: colors.text.primary,
-    paddingVertical: 14,
-    paddingHorizontal: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 0,
   },
   inputWithLeftIcon: {
-    paddingLeft: 44,
+    paddingLeft: 32,
   },
   inputWithRightIcon: {
-    paddingRight: 44,
+    paddingRight: 32,
   },
   iconLeft: {
     position: 'absolute',
-    left: 14,
+    left: 0,
     zIndex: 1,
   },
   iconRight: {
     position: 'absolute',
-    right: 14,
+    right: 0,
     zIndex: 1,
   },
   error: {

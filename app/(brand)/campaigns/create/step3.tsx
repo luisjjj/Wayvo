@@ -58,7 +58,7 @@ export default function Step3Screen() {
               variant="danger"
               size="sm"
               style={styles.removeButton}
-              icon={<CloseIcon size={14} color={colors.white} />}
+              icon={<CloseIcon size={14} color={colors.semantic.danger} />}
             />
           </View>
         ))}
@@ -130,8 +130,10 @@ const styles = StyleSheet.create({
     position: 'relative',
     width: 100,
     height: 100,
-    borderRadius: 12,
+    borderRadius: 0,
     overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: colors.glass.border,
   },
   assetImage: {
     width: '100%',
@@ -143,12 +145,12 @@ const styles = StyleSheet.create({
     right: 4,
     width: 24,
     height: 24,
-    borderRadius: 12,
+    borderRadius: 0,
   },
   addButton: {
     width: 100,
     height: 100,
-    borderRadius: 12,
+    borderRadius: 0,
     borderStyle: 'dashed',
   },
   tipCard: {

@@ -13,8 +13,8 @@ export function Card({ children, style }: CardProps) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.glass.bg,
-    borderRadius: 20,
+    backgroundColor: colors.white,
+    borderRadius: 0,
     borderWidth: 1,
     borderColor: colors.glass.border,
     padding: 16,

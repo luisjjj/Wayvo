@@ -14,18 +14,18 @@ export function WalletStrip({ balance, pendingAmount, onWithdraw }: WalletStripP
   return (
     <View style={styles.container}>
       <View style={styles.balanceSection}>
-        <Text style={styles.balanceLabel}>Available Balance</Text>
+        <Text style={styles.balanceLabel}>AVAILABLE BALANCE</Text>
         <Text style={styles.balanceValue}>₦{balance.toLocaleString()}</Text>
         {pendingAmount > 0 && (
           <Text style={styles.pendingText}>
-            ₦{pendingAmount.toLocaleString()} pending
+            ₦{pendingAmount.toLocaleString()} PENDING
           </Text>
         )}
       </View>
       <Button
         title="Withdraw"
         onPress={onWithdraw}
-        variant="primary"
+        variant="secondary"
         size="sm"
         disabled={balance < 2000}
       />
@@ -38,30 +38,31 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: colors.glass.bg,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: colors.glass.border,
-    padding: 16,
+    backgroundColor: colors.black,
+    padding: 20,
+    marginTop: 12,
   },
   balanceSection: {
     flex: 1,
   },
   balanceLabel: {
-    fontFamily: typography.fontFamily.regular,
-    fontSize: typography.fontSize.xs,
-    color: colors.text.tertiary,
-    marginBottom: 2,
+    fontFamily: typography.fontFamily.medium,
+    fontSize: 10,
+    letterSpacing: 2,
+    color: 'rgba(255,255,255,0.55)',
+    marginBottom: 4,
   },
   balanceValue: {
     fontFamily: typography.fontFamily.displayBold,
-    fontSize: typography.fontSize.xl,
-    color: colors.semantic.success,
+    fontSize: typography.fontSize['2xl'],
+    color: colors.white,
+    letterSpacing: -0.5,
   },
   pendingText: {
     fontFamily: typography.fontFamily.regular,
-    fontSize: typography.fontSize.xs,
-    color: colors.semantic.warning,
-    marginTop: 2,
+    fontSize: 10,
+    letterSpacing: 1.5,
+    color: 'rgba(255,255,255,0.55)',
+    marginTop: 4,
   },
 });

@@ -73,9 +73,6 @@ export function useAuth() {
   useEffect(() => {
     const initAuth = async () => {
       try {
-        // FORCE SIGN-OUT — REMOVE THIS LINE AFTER TESTING FRESH SIGNUP
-        await supabase.auth.signOut();
-
         const {
           data: { session },
         } = await supabase.auth.getSession();

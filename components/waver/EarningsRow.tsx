@@ -72,8 +72,10 @@ const styles = StyleSheet.create({
   iconContainer: {
     width: 36,
     height: 36,
-    borderRadius: 18,
+    borderRadius: 0,
     backgroundColor: colors.glass.bgHover,
+    borderWidth: 1,
+    borderColor: colors.glass.border,
     alignItems: 'center',
     justifyContent: 'center',
   },

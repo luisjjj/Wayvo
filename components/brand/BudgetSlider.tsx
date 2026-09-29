@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
   },
   breakdown: {
     backgroundColor: colors.glass.bg,
-    borderRadius: 16,
+    borderRadius: 0,
     borderWidth: 1,
     borderColor: colors.glass.border,
     padding: 16,

@@ -8,7 +8,6 @@ import {
   ViewStyle,
   TextStyle,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { colors } from '@/constants/colors';
 import { FontFamily } from '@/constants/fonts';
 
@@ -43,9 +42,9 @@ export function Button({
   const isDisabled = disabled || loading;
 
   const sizeStyles = {
-    sm: { paddingVertical: 8, paddingHorizontal: 14, fontSize: 13 },
-    md: { paddingVertical: 12, paddingHorizontal: 20, fontSize: 15 },
-    lg: { paddingVertical: 14, paddingHorizontal: 24, fontSize: 16 },
+    sm: { paddingVertical: 9, paddingHorizontal: 14, fontSize: 12 },
+    md: { paddingVertical: 14, paddingHorizontal: 20, fontSize: 13 },
+    lg: { paddingVertical: 16, paddingHorizontal: 24, fontSize: 14 },
   };
 
   const getContainerStyle = (): ViewStyle[] => {
@@ -60,7 +59,7 @@ export function Button({
 
     switch (variant) {
       case 'primary':
-        return base;
+        return [...base, styles.primaryContainer];
       case 'secondary':
         return [...base, styles.secondaryContainer];
       case 'outline':
@@ -80,6 +79,7 @@ export function Button({
     const base: TextStyle[] = [
       styles.text,
       { fontSize: sizeStyles[size].fontSize },
+      textStyle as TextStyle,
     ];
 
     switch (variant) {
@@ -100,45 +100,11 @@ export function Button({
     }
   };
 
-  if (variant === 'primary' || variant === 'danger' || variant === 'success') {
-    const gradientColors: [string, string] =
-      variant === 'primary'
-        ? [colors.accent.primary, colors.accent.secondary]
-        : variant === 'danger'
-        ? ['#C70036', '#F43F5E']
-        : ['#009966', '#5CF0C8'];
-
-    return (
-      <TouchableOpacity
-        onPress={onPress}
-        disabled={isDisabled}
-        activeOpacity={0.8}
-        style={[style, isDisabled && styles.disabled]}
-      >
-        <LinearGradient
-          colors={(isDisabled ? ['#333', '#444'] : gradientColors) as [string, string]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={[...getContainerStyle(), isDisabled && styles.disabledGradient]}
-        >
-          {loading ? (
-            <ActivityIndicator color={colors.white} size="small" />
-          ) : (
-            <View style={styles.content}>
-              {icon}
-              <Text style={[...getTextStyle(), isDisabled && styles.disabledText]}>{title}</Text>
-            </View>
-          )}
-        </LinearGradient>
-      </TouchableOpacity>
-    );
-  }
-
   return (
     <TouchableOpacity
       onPress={onPress}
       disabled={isDisabled}
-      activeOpacity={0.8}
+      activeOpacity={0.75}
       style={[
         ...getContainerStyle(),
         isDisabled && styles.disabled,
@@ -147,7 +113,7 @@ export function Button({
     >
       {loading ? (
         <ActivityIndicator
-          color={variant === 'ghost' ? colors.text.primary : colors.white}
+          color={variant === 'primary' || variant === 'success' ? colors.white : colors.black}
           size="small"
         />
       ) : (
@@ -165,7 +131,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 14,
+    borderRadius: 0,
+    borderWidth: 1,
+    borderColor: 'transparent',
   },
   fullWidth: {
     width: '100%',
@@ -177,49 +145,56 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   text: {
-    fontFamily: FontFamily.semibold,
-    letterSpacing: 0.1,
+    fontFamily: FontFamily.medium,
+    letterSpacing: 2,
+    textTransform: 'uppercase',
+  },
+  primaryContainer: {
+    backgroundColor: colors.black,
+    borderColor: colors.black,
   },
   primaryText: {
     color: colors.white,
   },
   secondaryContainer: {
-    backgroundColor: 'rgba(255,255,255,0.06)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+    backgroundColor: colors.white,
+    borderColor: colors.black,
   },
   secondaryText: {
-    color: colors.text.primary,
+    color: colors.black,
   },
   outlineContainer: {
     backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.12)',
+    borderColor: colors.glass.border,
   },
   outlineText: {
     color: colors.text.primary,
   },
   ghostContainer: {
     backgroundColor: 'transparent',
+    borderColor: 'transparent',
   },
   ghostText: {
     color: colors.text.primary,
   },
-  dangerContainer: {},
+  dangerContainer: {
+    backgroundColor: colors.white,
+    borderColor: colors.semantic.danger,
+  },
   dangerText: {
+    color: colors.semantic.danger,
+  },
+  successContainer: {
+    backgroundColor: colors.black,
+    borderColor: colors.black,
+  },
+  successText: {
     color: colors.white,
   },
-  successContainer: {},
-  successText: {
-    color: colors.text.inverse,
-  },
   disabled: {
-    opacity: 0.4,
-  },
-  disabledGradient: {
-    opacity: 0.4,
+    opacity: 0.35,
   },
   disabledText: {
-    opacity: 0.6,
+    opacity: 0.7,
   },
 });

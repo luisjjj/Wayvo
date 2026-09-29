@@ -8,11 +8,23 @@ import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/hooks/useAuth';
 
 export default function SettingsScreen() {
-  const { user, updateProfile, signOut } = useAuth();
+  const { user, waverProfile, brandProfile, updateProfile, signOut } = useAuth();
 
   const toggleMode = async () => {
     if (!user) return;
     const newMode = user.active_mode === 'waver' ? 'brand' : 'waver';
+    // Never strand a user in a role they haven't set up — send them
+    // through profile setup for the missing role instead.
+    if (newMode === 'brand' && !brandProfile) {
+      await updateProfile({ active_mode: 'brand' });
+      router.replace('/(auth)/profile-setup?mode=brand');
+      return;
+    }
+    if (newMode === 'waver' && !waverProfile) {
+      await updateProfile({ active_mode: 'waver' });
+      router.replace('/(auth)/profile-setup?mode=waver');
+      return;
+    }
     await updateProfile({ active_mode: newMode });
     if (newMode === 'brand') {
       router.replace('/(brand)');
@@ -44,7 +56,7 @@ export default function SettingsScreen() {
           <Switch
             value={user?.active_mode === 'brand'}
             onValueChange={toggleMode}
-            trackColor={{ false: colors.glass.bgHover, true: colors.accent.primary }}
+            trackColor={{ false: '#D9D9D9', true: colors.accent.primary }}
             thumbColor={colors.white}
           />
         </View>
@@ -66,7 +78,7 @@ export default function SettingsScreen() {
 
       <Button
         title="Sign Out"
-        onPress={signOut}
+        onPress={async () => { await signOut(); router.replace('/(auth)/onboarding'); }}
         variant="danger"
         fullWidth
       />

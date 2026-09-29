@@ -1,7 +1,6 @@
 import React from 'react';
-import { Stack, Tabs } from 'expo-router';
-import { View, TouchableOpacity, StyleSheet, Platform } from 'react-native';
-import { usePathname } from 'expo-router';
+import { Tabs, Redirect } from 'expo-router';
+import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import {
   HomeIcon,
   CampaignIcon,
@@ -9,18 +8,20 @@ import {
   ProfileIcon,
 } from '@/components/icons';
 import { colors } from '@/constants/colors';
+import { FontFamily } from '@/constants/fonts';
+import { useAuthStore } from '@/stores/authStore';
 
-function PillTabBar({ state, navigation }: any) {
+function ZaraTabBar({ state, navigation }: any) {
   const tabDefs = [
-    { name: 'index', icon: HomeIcon },
-    { name: 'campaigns', icon: CampaignIcon },
-    { name: 'wallet', icon: WalletIcon },
-    { name: 'profile', icon: ProfileIcon },
+    { name: 'index', label: 'Home', icon: HomeIcon },
+    { name: 'campaigns', label: 'Campaigns', icon: CampaignIcon },
+    { name: 'wallet', label: 'Wallet', icon: WalletIcon },
+    { name: 'profile', label: 'Profile', icon: ProfileIcon },
   ];
 
   return (
-    <View style={pillStyles.container}>
-      <View style={pillStyles.pill}>
+    <View style={barStyles.container}>
+      <View style={barStyles.bar}>
         {state.routes.map((route: any, index: number) => {
           const isFocused = state.index === index;
           const tab = tabDefs[index];
@@ -32,13 +33,16 @@ function PillTabBar({ state, navigation }: any) {
               key={route.key}
               onPress={() => navigation.navigate(route.name)}
               activeOpacity={0.7}
-              style={[pillStyles.tab, isFocused && pillStyles.activeTab]}
+              style={barStyles.tab}
             >
               <Icon
-                size={21}
-                color={isFocused ? colors.accent.primary : colors.text.tertiary}
+                size={20}
+                color={isFocused ? colors.accent.primary : '#999999'}
                 focused={isFocused}
               />
+              <Text style={[barStyles.label, isFocused && barStyles.labelActive]}>
+                {tab.label.toUpperCase()}
+              </Text>
             </TouchableOpacity>
           );
         })}
@@ -48,9 +52,22 @@ function PillTabBar({ state, navigation }: any) {
 }
 
 export default function WaverLayout() {
+  const { user, isLoading, isAuthenticated } = useAuthStore();
+
+  // Role guard: keep brand-mode users and guests out of waver routes.
+  // Strict opposite-role check only — avoids redirect loops on unknown modes.
+  if (!isLoading) {
+    if (!isAuthenticated || !user) {
+      return <Redirect href="/(auth)/onboarding" />;
+    }
+    if (user.active_mode === 'brand') {
+      return <Redirect href="/(brand)" />;
+    }
+  }
+
   return (
     <Tabs
-      tabBar={(props) => <PillTabBar {...props} />}
+      tabBar={(props) => <ZaraTabBar {...props} />}
       screenOptions={{
         headerShown: false,
       }}
@@ -63,42 +80,36 @@ export default function WaverLayout() {
   );
 }
 
-const pillStyles = StyleSheet.create({
+const barStyles = StyleSheet.create({
   container: {
     position: 'absolute',
-    bottom: Platform.OS === 'ios' ? 28 : 20,
+    bottom: 0,
     left: 0,
     right: 0,
-    alignItems: 'center',
+    backgroundColor: colors.white,
+    borderTopWidth: 1,
+    borderTopColor: colors.glass.border,
+    paddingBottom: Platform.OS === 'ios' ? 24 : 12,
+    paddingTop: 8,
     zIndex: 100,
-    pointerEvents: 'box-none',
   },
-  pill: {
+  bar: {
     flexDirection: 'row',
-    backgroundColor: 'rgba(18, 18, 31, 0.95)',
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
-    paddingHorizontal: 6,
-    paddingVertical: 6,
-    gap: 2,
-    ...(Platform.OS === 'ios'
-      ? {
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: 8 },
-          shadowOpacity: 0.4,
-          shadowRadius: 24,
-        }
-      : { elevation: 16 }),
   },
   tab: {
-    width: 46,
-    height: 46,
-    borderRadius: 23,
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    gap: 4,
+    paddingVertical: 4,
   },
-  activeTab: {
-    backgroundColor: 'rgba(255, 77, 0, 0.18)',
+  label: {
+    fontFamily: FontFamily.medium,
+    fontSize: 9,
+    letterSpacing: 1.5,
+    color: '#999999',
+  },
+  labelActive: {
+    color: colors.accent.primary,
   },
 });

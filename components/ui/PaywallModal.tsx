@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, Modal, StyleSheet, TouchableOpacity } from 'react-native';
 import { colors } from '@/constants/colors';
 import { typography } from '@/constants/typography';
+import { FontFamily } from '@/constants/fonts';
 import { Button } from './Button';
 
 interface PaywallModalProps {
@@ -27,9 +28,7 @@ export function PaywallModal({
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <View style={styles.overlay}>
         <View style={styles.container}>
-          <View style={styles.edgeTop} />
-          <View style={styles.edgeLeft} />
-
+          <Text style={styles.eyebrow}>Wayvo Pro</Text>
           <Text style={styles.title}>{title}</Text>
           <Text style={styles.price}>{price}</Text>
           <Text style={styles.period}>/month</Text>
@@ -68,31 +67,21 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   container: {
-    backgroundColor: colors.glass.bg,
-    borderRadius: 20,
+    backgroundColor: colors.white,
+    borderRadius: 0,
     borderWidth: 1,
-    borderColor: colors.glass.border,
+    borderColor: colors.black,
     padding: 24,
     width: '100%',
     maxWidth: 400,
-    position: 'relative',
-    overflow: 'hidden',
   },
-  edgeTop: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 1,
-    backgroundColor: 'rgba(255,255,255,0.15)',
-  },
-  edgeLeft: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: 1,
-    height: '100%',
-    backgroundColor: 'rgba(255,255,255,0.08)',
+  eyebrow: {
+    fontFamily: FontFamily.medium,
+    fontSize: 11,
+    letterSpacing: 2.5,
+    color: colors.text.tertiary,
+    textAlign: 'center',
+    marginBottom: 8,
   },
   title: {
     fontFamily: typography.fontFamily.displayBold,
@@ -104,7 +93,7 @@ const styles = StyleSheet.create({
   price: {
     fontFamily: typography.fontFamily.displayBold,
     fontSize: typography.fontSize['3xl'],
-    color: colors.semantic.success,
+    color: colors.black,
     textAlign: 'center',
   },
   period: {
@@ -124,7 +113,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   check: {
-    color: colors.semantic.success,
+    color: colors.black,
     fontSize: 16,
     fontWeight: '700',
   },

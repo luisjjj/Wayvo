@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
 import { colors } from '@/constants/colors';
 import { typography } from '@/constants/typography';
 import { GlassCard } from '@/components/ui/GlassCard';
@@ -11,10 +10,12 @@ import { PlatformPill } from '@/components/ui/PlatformPill';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { useCampaigns } from '@/hooks/useCampaigns';
 import { CampaignWithBrand } from '@/types/campaign';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function CampaignDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { fetchCampaign, currentCampaign: rawCampaign, acceptCampaign } = useCampaigns();
+  const { user } = useAuth();
+  const { fetchCampaign, currentCampaign: rawCampaign, claimAndAccept } = useCampaigns();
   const currentCampaign = rawCampaign as CampaignWithBrand | undefined;
   const [loading, setLoading] = useState(false);
   const [accepted, setAccepted] = useState(false);
@@ -26,10 +27,10 @@ export default function CampaignDetailScreen() {
   }, [id]);
 
   const handleAccept = async () => {
-    if (!currentCampaign) return;
+    if (!currentCampaign || !user) return;
     setLoading(true);
     try {
-      await acceptCampaign(currentCampaign.id);
+      await claimAndAccept(currentCampaign.id, user.id, currentCampaign.per_waver_payout);
       setAccepted(true);
       router.push(`/(waver)/campaigns/${currentCampaign.id}/proof`);
     } catch (error) {
@@ -49,17 +50,13 @@ export default function CampaignDetailScreen() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <LinearGradient
-        colors={[colors.accent.primary, colors.accent.secondary]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.hero}
-      >
-        <Text style={styles.heroTitle}>{currentCampaign.title}</Text>
+      <View style={styles.hero}>
         <Text style={styles.heroBrand}>
-          {currentCampaign.brand_profiles?.business_name || 'Brand'}
+          {(currentCampaign.brand_profiles?.business_name || 'Brand').toUpperCase()}
         </Text>
-      </LinearGradient>
+        <Text style={styles.heroTitle}>{currentCampaign.title}</Text>
+        <View style={styles.heroRule} />
+      </View>
 
       <GlassCard style={styles.payoutCard}>
         <Text style={styles.payoutLabel}>Your Payout</Text>
@@ -139,22 +136,33 @@ const styles = StyleSheet.create({
   hero: {
     padding: 24,
     paddingTop: 60,
-    paddingBottom: 32,
+    paddingBottom: 8,
+    backgroundColor: colors.white,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.glass.border,
+  },
+  heroBrand: {
+    fontFamily: typography.fontFamily.medium,
+    fontSize: 11,
+    letterSpacing: 2.5,
+    color: colors.text.tertiary,
+    marginBottom: 8,
   },
   heroTitle: {
     fontFamily: typography.fontFamily.displayBold,
-    fontSize: typography.fontSize['2xl'],
-    color: colors.white,
-    marginBottom: 8,
+    fontSize: typography.fontSize['3xl'],
+    letterSpacing: -0.5,
+    color: colors.black,
   },
-  heroBrand: {
-    fontFamily: typography.fontFamily.regular,
-    fontSize: typography.fontSize.sm,
-    color: 'rgba(255,255,255,0.8)',
+  heroRule: {
+    width: 40,
+    height: 2,
+    backgroundColor: colors.black,
+    marginTop: 16,
   },
   payoutCard: {
     marginHorizontal: 16,
-    marginTop: -16,
+    marginTop: 16,
     alignItems: 'center',
   },
   payoutLabel: {
@@ -183,7 +191,9 @@ const styles = StyleSheet.create({
   infoItem: {
     flex: 1,
     backgroundColor: colors.glass.bg,
-    borderRadius: 12,
+    borderRadius: 0,
+    borderWidth: 1,
+    borderColor: colors.glass.border,
     padding: 12,
     alignItems: 'center',
   },

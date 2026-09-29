@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { router } from 'expo-router';
 import { colors } from '@/constants/colors';
 import { typography } from '@/constants/typography';
 import { GlassCard } from '@/components/ui/GlassCard';
@@ -53,7 +54,7 @@ export default function BrandProfileScreen() {
         </View>
       </GlassCard>
 
-      <Button title="Sign Out" onPress={signOut} variant="ghost" fullWidth />
+      <Button title="Sign Out" onPress={async () => { await signOut(); router.replace('/(auth)/onboarding'); }} variant="ghost" fullWidth />
     </ScrollView>
   );
 }
